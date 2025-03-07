@@ -71,4 +71,13 @@
     print(floor(4.99)) #floor은 내림이다-->4
     print(ceil(3.14)) #ceil은 올림이다-->4
     print(sqrt(16)) #sqrt는 제곱근-->4
-    
+## 3-4 랜덤함수
+    from random import *
+
+    print(random()) #0.0~1.0 미만의 임의의 값 생성
+    print(random()* 10) #0.0~10.0 미만의 임의의 값 생성
+    print(int(random()* 10)) #0~10 미만의 임의의 값 생성
+    print(int(random()* 10)+1) #1~10 이하의 임의의 값 생성
+
+    print(randrange(1, 46)) #1~46 미만의 임의의 값 생성(오른쪽 숫자는 포함x)
+    print(randint(1, 45) #1~45 이하의 임의의 값 생성(오른쪽 숫자도 포함o)
