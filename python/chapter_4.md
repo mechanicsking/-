@@ -28,4 +28,9 @@
     index = python.index("n", index+1) #문자열.index("찾고싶은 문자",스타트 위치)
     print(index)
 
-    print(python.find("Java")
+    print(python.find("Java")) #원하는 값이 없을 때 -1값을 출력& 프로그램 종료하지 않음
+    print(python.index("Java")) #원하는 값이 없을 때 오류를 내면서 프로그램 종료
+    print(python.count("n")) #count-->단어가 몇번 나오는지 값을 출력해줌-->2
+## 4-4 문자열포맷
+    print("a" +"b")
+    print("a", "b")
