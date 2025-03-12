@@ -33,3 +33,12 @@ alias로 humble만들기
     alias humble="source /opt/ros/humble/setup.bash; echo \"ROS2 humble is activated!\""
 source ~/.bashrc도 alias 해두기
     alias sb="source ~/.bashrc; echo \"bashrc is reloaded\""
+## 2-5 ROS_DOMAIN_ID 설정
+ros2 도메인 설정
+
+ros1과 ros2 차이점:DDS(Data Distribution Service)데이터 분산 서비스
+
+DDS는 실시간 시스템의 실시간성, 규모가변성, 안전성, 고성능을 가능하게 하는 Object Management Group(OMG) 표준 출판/구속(Publish/Subscribe) 네트워크 커뮤니케이션 미들웨어이다.
+domain id를 하나로 맞추면 같은 id의 device끼리 연결이된다.
+    alias ros_domain="export ROS_DOMAIN_ID=13"
+위의 alias humble에 ros_domain을 추가한다.
