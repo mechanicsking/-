@@ -1,5 +1,6 @@
 ## 2-3 bashrc 설정
 현재 shell 확인
+
     ~$ echo $SEHLL
     /bin/bash
 shell이란?-->셸은 키보드 명령을 받아 운영 체제에 전달하여 실행하는 프로그램
