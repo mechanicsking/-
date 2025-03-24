@@ -45,3 +45,27 @@ Request와 Response를 구분하기 위해 다음과 같이 표기한다.
     ros2 interface show turtlesim/srv/TeleportAbsolute
 ros에서의 단위는 kg, sec, m와 각도에서는 rad을 선호
 ## 3-5 Ros2 Service call 1
+service를 call하는 명령 -tab을 적절히 사용하자
+
+    ~$ ros2 service call /turtle1/teleport_absolute turtlesim/srv/TeleportAbsolute "{x: 2, y: 2, theta: 1.57}"
+이 서비스를 통해 이동
+
+    ~$ ros2 service type /reset
+reset이라는 서비스 확인
+
+    ~$ ros2 service call /reset std_srvs/srv/Empty {}
+제자리로 돌려줌
+## 3-6 Ros2 Service call 2
+    /clear
+    /kill
+    /reset
+    /spawn
+    /turtle1/set_pen
+    /turtle1/teleport_absolute
+    /turtle1/teleport_relative
+    /turtlesim/describe_parameters
+    /turtlesim/get_parameter_types
+    /turtlesim/get_parameters
+    /turtlesim/list_parameters
+    /turtlesim/set_parameters
+    /turtlesim/set_parameters_atomically
