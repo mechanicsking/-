@@ -76,12 +76,12 @@ spawn에 대해 알아보자
 어떻게 구성되는 지 알아보기
 
     ros2 interface show turtlesim/srv/Spawn
->
+
 float32 x
 float32 y
 float32 theta
 string name # Optional.  A unique name will be created and returned if this is empty
----
+---.
 string name
 
 ---위에 쪽은 받는 것
