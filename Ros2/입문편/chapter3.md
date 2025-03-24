@@ -77,12 +77,13 @@ spawn에 대해 알아보자
 
     ros2 interface show turtlesim/srv/Spawn
 
-float32 x
-float32 y
-float32 theta
-string name # Optional.  A unique name will be created and returned if this is empty
----.
-string name
+    float32 x
+    float32 y
+    float32 theta
+    string name # Optional.  A unique name will be created and returned if this is empty
+    ---
+    string name
 
----위에 쪽은 받는 것
-x, y, theta, stringname을 받음
+---위에 쪽 입력: x, y, theta, stringname을 받음,
+
+---아래쪽 출력
