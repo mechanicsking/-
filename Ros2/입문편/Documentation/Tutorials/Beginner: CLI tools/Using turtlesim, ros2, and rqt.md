@@ -17,7 +17,7 @@ $sudo apt update
 $sudo apt install ros-humble-turtlesim
 ```
 하지만 ros2를 다운받았다면 같이 깔려있을 것이다. 이 패키지가 다운받아져 잇는지 알아모려면 다음의 명령어를 실행하여 다음과 같이 나오는지 확인해본다. 
-```terminal
+```
 $ros2 pkg executables turtlesim
 turtlesim draw_square
 turtlesim mimic
