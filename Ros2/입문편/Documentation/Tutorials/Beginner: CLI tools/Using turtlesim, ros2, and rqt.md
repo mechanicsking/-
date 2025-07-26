@@ -56,5 +56,6 @@ $ros2 action list
 <img width="384" height="370" alt="image" src="https://github.com/user-attachments/assets/35d469e4-aba5-4c7b-aca1-e3594625a078" />      
 <img width="289" height="49" alt="image" src="https://github.com/user-attachments/assets/2794407e-8ec6-48f7-84ec-3d3a42aff31b" />      
 다음과 같이 잘 실행되는 모습을 확인해 볼 수 있다. 해당 개념은 다음 튜토리얼에서 배우게 된다. 본 챕터에서는 단지 turtlesim이 뭔지만 알아본다.      
+
 ### 4. Install rqt
 다음과 같이 rqt를 다운받는다. 하지만 ros2를 깔았다면 
