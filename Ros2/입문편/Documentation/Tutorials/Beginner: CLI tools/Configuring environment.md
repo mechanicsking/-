@@ -41,4 +41,11 @@ ROS_DISTRO=humble
   $echo "export ROS_DOMAIN_ID=<your_domain_id>" >> ~/.bashrc
   ```
 * 3.2 The ROS_LOCALHOST_ONLY variable
-  
+  기본적으로 ros2 통신은 로컬 호스트에 국한 되지 않는다. ROS_LOCALHOST_ONLY 환경변수를 사용하면 ros2 통신을 로컬 호스트로만 제한 할 수 있다. 이것은 자신의 ros2시스템이 local network에 있는 다른 컴퓨터에 보이지 않는것을 의미한다. 이를 사용하기 위해 다음의 명령어를 사용한다.
+  ```
+  export ROS_LOCALHOST_ONLY=1
+  ```
+  셀 세션 간에 이 설정을 유지하려면 다음의 명령어를 추가하면된다.
+  ```
+  echo "export ROS_LOCALHOST_ONLY=1" >> ~/.bashrc
+  ```
