@@ -42,7 +42,8 @@ $ros2 run turtlesim turtle_teleop_key
 ```
 이 시점에서는 3개의 윈도우가 열려있게 된다. turtlesim_node를 작동시키는 터미널과 turtle_teleop_key를 실행시키는 터미널, 그리고 위의 화면과 같은  turtlesim window이다.      
 키보드의 키를 통해 터틀을 움직일 수 있다. 터틀은 움직이며 경로를 만들어낸다. 키를 누르면 터틀이 짧은 거리를 이동했다가 멈출 것이다.      
-만약 node, 연관된 topic, services, action을 확인해보고싶다면 list subcommand들을 사용하면 된다.    
+만약 node, 연관된 topic, services, action을 확인해보고싶다면 list subcommand들을 사용하면 된다.     
+
 ```
 $ros2 node list
 $ros2 topic list
