@@ -78,7 +78,30 @@ Service 드롭다운 리스트를 클리해 turtlesim의 서비스를 확인하�
   만약 turtle의 이름이 생성된 turtle과 같다면(ex.turtle1) 다음과 같이 에러가 뜬다.
   [ERROR] [turtlesim]: A turtle named [turtle1] already exists
   이제 turtle2를 생성하고 싶다면 call button을 클릭해준다. service call이 성공적이라면 새로운 turtle이 지정한 좌표에 생성된 것을 확인할 수 있다.     
-  <img width="504" height="497" alt="image" src="https://github.com/user-attachments/assets/387d1b8f-4b90-443e-b793-454d1759e876" />
-  이제 rqt 서비스 리스트를 새로 고침을 하면 새로운 터틀에 관한 서비스가 생긴 것을 확인해볼 수 있다./turtle2/...
+  <img width="504" height="497" alt="image" src="https://github.com/user-attachments/assets/387d1b8f-4b90-443e-b793-454d1759e876" />     
+  이제 rqt 서비스 리스트를 새로 고침을 하면 새로운 터틀에 관한 서비스가 생긴 것을 확인해볼 수 있다./turtle2/...     
 * 5.2 Try the set_pen service
+  이제 turtle1에 /set_pen 서비스를 이용해 고유한 pen의 특성을 제공한다.        
+  <img width="603" height="483" alt="image" src="https://github.com/user-attachments/assets/90a53b08-fcfa-4cb7-9f7e-84963a5a61a4" />      
+  r과 g와 b의 값을 0에서 255 사이에서 선택하여 tutle1이 지나가면서 그린 pen의 색을 설정해준다. 그리고 width는 이 라인의 두께를 나타낸다. 만약 red line으로만 그리고 싶다면 r의 값을 255로 설정하고 width는5로 해보자. 서비스의 call을 해야만 결과가 바뀌는 거슬 잇지 마라.     
+  <img width="603" height="483" alt="image" src="https://github.com/user-attachments/assets/df27f10d-2cb3-4122-8355-31875936ad9d" />     
+  <img width="500" height="538" alt="image" src="https://github.com/user-attachments/assets/b8463dd7-5bf9-45f0-b457-4b02a7d6ea2a" />    
+  다음과 같이 펜의 색이 달라짐을 확인해볼 수 있다. 현재 turtle2를 움직일 방법은 없다는 것을 알고있어라. 그 이유는 turtle2를 위한 teleop node가 없기 때문이다.
+
+
+### 6. Remapping
+turtle2를 다루기 위해 두번째 teleop node가 필요하다. 그러나 이전과 동일한 명령을 실행하려고 하면 이 명령어도 turtle1을 제어한다는 것을 알 수 있다. 이 동작을 변경하는 방법은 cmd_vel 토픽을 다시 매핑하는 것이다.     
+새로운 터미널에서 다음의 명령어를 실행한다.    
+```
+$ros2 run turtlesim turtle_teleop_key --ros-args --remap turtle1/cmd_vel:=turtle2/cmd_vel
+```
+다음과 같이 키보드로 이동할 수 있는 것을 볼 수 있다.    
+<img width="500" height="538" alt="image" src="https://github.com/user-attachments/assets/2ef5bdaf-5af8-454d-b073-56d3e76177cf" />     
+이제 새로운 터미널에서 turtle2를 움직일 수 있고, 원래의 turtle_teleop_key를 실행한 터미널에서 turtle1을 움직일 수 있다.    
+### 7. Close turtlesim
+시뮬레이션을 그만하고 싶다면 turtlesim_node를 실행한 터미널에서 ctrl+c를 누르면 되고, turtle_teleop_key 터미널에서는 q를 누르면된다.   
+## Summary
+turltesim과 rqt는 ros2의 core 컨셉을 학습하는데 좋은 방법이다. 
+## Next step
+다음은 core 컨셉중 하나인 node에대해 배우게 된다.    
 
