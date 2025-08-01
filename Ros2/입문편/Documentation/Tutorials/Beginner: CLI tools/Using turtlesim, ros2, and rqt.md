@@ -50,7 +50,7 @@ $ros2 topic list
 $ros2 service list
 $ros2 action list
 ```
-
+     
 <img width="407" height="94" alt="image" src="https://github.com/user-attachments/assets/bf6b4a3d-45e2-4478-9664-b7a606aced00" />       
 <img width="399" height="114" alt="image" src="https://github.com/user-attachments/assets/9e4659e0-d5a7-41c7-a915-95f3c870647c" />      
 <img width="384" height="370" alt="image" src="https://github.com/user-attachments/assets/35d469e4-aba5-4c7b-aca1-e3594625a078" />      
@@ -58,4 +58,27 @@ $ros2 action list
 다음과 같이 잘 실행되는 모습을 확인해 볼 수 있다. 해당 개념은 다음 튜토리얼에서 배우게 된다. 본 챕터에서는 단지 turtlesim이 뭔지만 알아본다.      
 
 ### 4. Install rqt
-다음과 같이 rqt를 다운받는다. 하지만 ros2를 깔았다면 
+다음과 같이 rqt를 다운받는다. 하지만 ros2를 깔때 같이 깔렸을 것이다.
+```
+$sudo apt update
+$sudo apt install '~nros-humble-rqt*'
+```
+해당 명령어를 통해 rqt를 실행해본다.     
+```
+$rqt
+```
+### 5. Use rqt
+rqt를 처음 실행할 때 창은 빈칸일 것이다. 
+이때 Plugins > Services > Service Caller을 눌러 다음의 화면에서 새로 고침버튼을 사용하여 터틀심 노드의 모든 서비스를 사용할 수 있는지 확인할 수 있다.       
+<img width="602" height="747" alt="image" src="https://github.com/user-attachments/assets/d5388300-6d17-4a00-b3f6-f0a66ef4e560" />      
+Service 드롭다운 리스트를 클리해 turtlesim의 서비스를 확인하고 /spawn 서비스를 선택하라.
+* 5.1 Try the spawn service
+  rqt를 이용해 /spawn 서비스를 이용해보자. /spawn은 단어그대로 다른 turtle을 turtlesim창에 생성할 수 있다는 것을 추측해볼 수 있다. 새로운 turtle에는 turtle2와 같이 고유한 이름을 주어야 한다. 이 표현식은 이름값에 해당하며 string유형이다. 다음과 같이 x와 y에 turtle이 생성될 좌표값을 설정해서 넣어준다. 해당 예시에선 1,1을 부여해준다.     
+  <img width="603" height="494" alt="image" src="https://github.com/user-attachments/assets/9a977b21-0c19-40e9-b0aa-06c70fd661e2" />
+  만약 turtle의 이름이 생성된 turtle과 같다면(ex.turtle1) 다음과 같이 에러가 뜬다.
+  [ERROR] [turtlesim]: A turtle named [turtle1] already exists
+  이제 turtle2를 생성하고 싶다면 call button을 클릭해준다. service call이 성공적이라면 새로운 turtle이 지정한 좌표에 생성된 것을 확인할 수 있다.     
+  <img width="504" height="497" alt="image" src="https://github.com/user-attachments/assets/387d1b8f-4b90-443e-b793-454d1759e876" />
+  이제 rqt 서비스 리스트를 새로 고침을 하면 새로운 터틀에 관한 서비스가 생긴 것을 확인해볼 수 있다./turtle2/...
+* 5.2 Try the set_pen service
+
