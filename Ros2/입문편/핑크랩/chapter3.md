@@ -30,7 +30,9 @@ sudo apt install 명령으로 설치한 ros pkg들이 저장된 곳
 
 service definition과 서비스의 개념
 
-어떤 node가 request하면 다른 node가 response해준다. 이때 이 사이에서 definition이 필요함(type)
+어떤 node가 request하면 다른 node가 response해준다. 이때 이 사이에서 definition이 필요함(type)      
+<img width="1197" height="641" alt="image" src="https://github.com/user-attachments/assets/e7eb581a-13d6-4bc3-936a-ee53ea16b24e" />     
+
 
 뭔가를 요쳥할 때 데이터를 줘야할 때가 있다. 그때 데이터의 타입들이 정의가 되어있어야함. 리스폰스 할때에도 그 데이터의 타입들이 정의가 되어있어야함. 이것들을 하나의 파일에 기록을 해두어야한다. 이를 기록해둔 파일이 .srv이다.
 Request와 Response를 구분하기 위해 다음과 같이 표기한다.
