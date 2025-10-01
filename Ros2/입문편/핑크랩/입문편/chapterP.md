@@ -95,3 +95,21 @@ plt.grid()
 plt.show()
 ```
 <img width="1002" height="505" alt="download" src="https://github.com/user-attachments/assets/1e1f1806-8a34-4de3-81d6-cbfc8392f97f" />
+
+그래프를 보면 2초에 한번찍이라는 것을 확인해볼 수 있다.
+이걸 바꾸고 싶을때마다 고쳐야하니 복잡하고 귀찮다. 혹시 모를 오류를 대비해서 함수로 만들어준다.  
+```python
+def draw_sin(t, A, f, b):
+    y = A * np.sin(np.pi * f * t) + b
+
+    plt.figure(figsize=(12,6))
+    plt.plot(t, y)
+    plt.grid()
+    plt.show()
+```
+이제 여기에 상수값만 집어넣어주면 그래프를 그려준다. 
+```python
+t = np.arange(0, 3, 0.01)
+draw_sin(t, 1, 1, 0)
+```
+<img width="1002" height="505" alt="download" src="https://github.com/user-attachments/assets/31af575b-d29e-4bb2-a280-0d6158602a70" />
