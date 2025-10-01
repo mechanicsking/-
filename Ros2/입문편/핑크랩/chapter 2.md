@@ -30,7 +30,7 @@ command_name이라는 명령을 만드는데 그 내용은 values이다.
 alias 지정 연습
 
     alias alias_test="echo \"Alias test\""
-echo "~~" 인데 ""가 너무 많기 때문에 안에 있는 문자열이라는 것을 표현하기 위해 \" ~ \"로 표현
+echo "~~" 인데 ""가 너무 많기 때문에 안에 있는 문자열이라는 것을 표현하기 위해 역슬레쉬\" ~ 역슬레쉬\"로 표현
 
 alias라는 명령을 통해 alias_test라는 명령을 만들것이고 그 명령이 할 일은 Alias test를 뿌릴것이다.
 
