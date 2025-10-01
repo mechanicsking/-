@@ -9,9 +9,9 @@ shell이란?-->셸은 키보드 명령을 받아 운영 체제에 전달하여 �
 
 .bashrc란 터미널을 실행했을때 가장 먼저 실행하는 설정들을 보관하고 있는 파일
 
-어떤 에디터든 .bashrc를 열 수 있다. sublime으로 열어보자
+어떤 에디터든 .bashrc를 열 수 있다. vscode으로 열어보자
 
-    ~$ subl ~/.bashrc
+    ~$ code ~/.bashrc
 열어서 마지막에 다음을 추가
 
     echo "ROS2 humble is activated!"
