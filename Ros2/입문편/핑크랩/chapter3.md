@@ -178,9 +178,9 @@ goal 목표
 ---
 피드백
 ```
-action에 goal을 주고 싶다면 send_goal 명령어 사용, 다음의 예시를 확인해보자.
-```
-action을 iterface show하면
+action에 goal을 주고 싶다면 send_goal 명령어 사용, 다음의 예시를 확인해보자.     
+
+action을 iterface show하면     
 ```
 ~$ ros2 action send_goal /turtle1/rotate_absolute turtlesim/action/RotateAbsolute "{theta: 3.14}"
 ```
