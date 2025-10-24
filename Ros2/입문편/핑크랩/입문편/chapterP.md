@@ -316,7 +316,7 @@ ds3.__dict__
 {'amp': 1, 'freq': 1, 'bias': 0, 'end_time': 3, 'ts': 0.01}
 ```
 따라서 클래서 super을 이용해서 클래스를 완성 할 수 있다. 
-```
+```python
 class DrawSinusoidal3(DrawSinusoidal2):
     def __init__(self, amp, freq, bias, end_time, ts):
         super().__init__(amp, freq, bias, end_time)
