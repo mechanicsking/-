@@ -1,4 +1,4 @@
-## P-2 삼각함수 그려보기
+## P-2&3 삼각함수 그려보기
 <img width="419" height="153" alt="image" src="https://github.com/user-attachments/assets/11daf6de-945d-4f73-90ae-9d411903cb46" />     
 
 f는 Hz 단위, A는 amplitude, b는 bias
@@ -113,6 +113,94 @@ t = np.arange(0, 3, 0.01)
 draw_sin(t, 1, 1, 0)
 ```
 <img width="1002" height="505" alt="download" src="https://github.com/user-attachments/assets/31af575b-d29e-4bb2-a280-0d6158602a70" />
-## P-4 클래스 만들어보기
+## P-4&5 클래스 만들어보기
 이번에는 클래스를 이용해서 sin그래프를 만들어보자!    
 간단한 클래스 선언
+```python
+class DrawSin:
+    def __init__(self, amp, freq, bias, end_time) :
+        self.amp = amp
+        self.freq = freq
+        self.bias = bias
+        self.end_time = end_time  
+```
+class에선 보통 이름에 첫글자를 대문자로 설정해준다. 그리고 class에서는 ()가 있을 때도 있고 없을 때도 있다. 첫번째줄에서 클래스를 선언해주었다.      
+이제 클래스 내용을 적어주는데 class 안에서 첫번째줄에서 __(던더)init__을 해주어야한다.이는 class를 선언할 때 아주 중요한 함수이다.      
+우리는 4개의 인자를 받을 건데 왜 5개를 작성했는가??-->이후에 확인    
+```python
+tmp = DrawSin(1, 1, 0, 3)
+tmp.__dict__
+```
+우리는 DrawSin이라는 class를 위에서 만들었다.그 클래스를 이제 쓸려고 한다.이것을 instanciation(객체화)라고 한다. 이는 변수로 만들어둔 클래스를 사용하겠다는 의미이다. tmp를 DrawSin class로 객체화했다.      
+이제 .__dict__로 tmp를 확인해보면 자동으로 배치가 된다. 
+```
+{'amp': 1, 'freq': 1, 'bias': 0, 'end_time': 3}
+```
+아까 def __init__(self, amp, freq, bias, end_time)에서 self는 객체가 될 변수이다. tmp = DrawSin(1, 1, 0, 3)에서는 tmp가 class 내부적으로는 self가 된다. 따라서 잘 작동하는지 확인해 본다면?
+```python
+tmp.amp, tmp.freq, tmp.bias, tmp.end_time
+```
+```
+(1, 1, 0, 3)
+```
+변수를 바꾸고 싶다면 다음과 같이
+```python
+tmp.end_time = 5.
+tmp.__dict__
+```
+```
+{'amp': 1, 'freq': 1, 'bias': 0, 'end_time': 5.0}
+```
+잘 바뀐것을 확인해 볼 수 있다.
+이제 그리는 기능을 추가해준다.
+```python
+class DrawSin:
+    def __init__(self, amp, freq, bias, end_time) :
+        self.amp = amp
+        self.freq = freq
+        self.bias = bias
+        self.end_time = end_time
+
+    def calc_sin(self):
+        self.t = np.arange(0, self.end_time, 0.01)
+        return self.amp * np.sin(2*np.pi*self.freq*self.t) + self.bias
+
+    def draw_sin(self):
+        y = self.calc_sin()
+        plt.figure(figsize=(12,6))
+        plt.plot(self.t, y)
+        plt.grid()
+        plt.show()
+```
+calc_sin이라는 것을 한개를 만들 것이다. self을 넣어서 self.t를 만들어주었고 여기에는 0부터 self.end_time까지 0.01간격으로의 arange를 저장해주었다. 이후 self.amp * np.sin(2*np.pi*self.freq*self.t) + self.bias를 return하게 해주었다.     
+이 함수는 draw_sin이라는 함수에서 사용될 것이다. draw_sin에서도 self를 받으며, self.calc_sin의 계산값을 y에 저장해주고 이를 그려준다.      
+이제 이 클래스가 잘 작동하는지 확인해보자.
+```python
+ds = DrawSin(1, 1, 0, 3)
+ds.draw_sin()
+```
+<img width="1002" height="505" alt="download" src="https://github.com/user-attachments/assets/70725531-7df3-4935-9dbb-e4f8c0a1e05f" />      
+
+이는 설정 변경에 용이하다.
+```python
+ds.freq = 2
+ds.draw_sin()
+```
+<img width="1002" height="505" alt="download" src="https://github.com/user-attachments/assets/68245d5e-3947-4928-82e8-e2398722ecce" />     
+
+## P-6&7 클래스의 상속
+만약 cos을 그리는 클래스를 만들고 싶다면 - 편하게 상속!!
+```python
+class DrawSinusoida(DrawSin):
+    def calc_cos(self):
+        self.t = np.arrange(0, self.end_time, 0.01)
+        return self.amp * np.cos(2*np.pi*self.freq*self.t) +self.bias
+
+    def draw_cos(self):
+        y = self.calc_cos()
+        plt.figure(figsize=(12,6))
+        plt.plot(self.t, y)
+        plt.grid()
+        plt.show()
+```
+이번에는 class선언에서 이름이 있고()가 있다. 그리고 그 안에는 아까 만들어둔 클래스가 입력되어있다.그리고 __init__이 없다. 
