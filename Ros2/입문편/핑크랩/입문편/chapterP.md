@@ -192,9 +192,9 @@ ds.draw_sin()
 ## P-6&7 클래스의 상속
 만약 cos을 그리는 클래스를 만들고 싶다면 - 편하게 상속!!
 ```python
-class DrawSinusoida(DrawSin):
+class DrawSinusoidal(DrawSin):
     def calc_cos(self):
-        self.t = np.arrange(0, self.end_time, 0.01)
+        self.t = np.arange(0, self.end_time, 0.01)
         return self.amp * np.cos(2*np.pi*self.freq*self.t) +self.bias
 
     def draw_cos(self):
@@ -204,4 +204,135 @@ class DrawSinusoida(DrawSin):
         plt.grid()
         plt.show()
 ```
-이번에는 class선언에서 이름이 있고()가 있다. 그리고 그 안에는 아까 만들어둔 클래스가 입력되어있다.그리고 __init__이 없다. 
+이번에는 class선언에서 이름이 있고()가 있다. 그리고 그 안에는 아까 만들어둔 클래스가 입력되어있다.그리고 __init__이 없다. 그런데도 밑에서는 self.amp를 사용하고 있다. 이러한 것을 상속이라고 한다.     
+class를 선언할 때 만들어둔 class를 넣어주면 그 class가 가지고 있는 것들이 새로운 class에 다 들어온다. 그렇기 때문에 다음과 같이 class를 호출해도 잘 작동하는 것을 확인 해 볼 수 있다. 
+```python
+dc = DrawSinusoidal(1, 1, 0, 3)
+dc.__dict__
+```
+```
+{'amp': 1, 'freq': 1, 'bias': 0, 'end_time': 3}
+```
+__dir__()을 사용해주면 함수부터 변수 다 나온다. 
+```python
+dc.__dir__()
+```
+```
+['amp',
+ 'freq',
+ 'bias',
+ 'end_time',
+ 't',
+ '__module__',
+ 'calc_cos',
+ 'draw_cos',
+ '__doc__',
+ '__init__',
+ 'calc_sin',
+ 'draw_sin',
+ '__dict__',
+ '__weakref__',
+ '__new__',
+ '__repr__',
+ '__hash__',
+ '__str__',
+ '__getattribute__',
+ '__setattr__',
+ '__delattr__',
+ '__lt__',
+ '__le__',
+ '__eq__',
+ '__ne__',
+ '__gt__',
+ '__ge__',
+ '__reduce_ex__',
+ '__reduce__',
+ '__subclasshook__',
+ '__init_subclass__',
+ '__format__',
+ '__sizeof__',
+ '__dir__',
+ '__class__']
+```
+```python
+dc.draw_cos()
+```
+<img width="1002" height="505" alt="download" src="https://github.com/user-attachments/assets/a3874940-eb30-4628-9e6d-e542aec4a436" />       
+
+이 클래스는 DrawSin을 상속했기 때문에 sin도 그릴 수 있다.
+```python
+dc.draw_sin()
+```
+<img width="1002" height="505" alt="download" src="https://github.com/user-attachments/assets/e433e865-61ca-4399-aab4-27e6dc4bc920" />        
+
+## P-8 매서드 오버라이딩
+이번에는 DrawSinusoidal2라는 클래스를 만들어서 위에서 만든 draw_sin의 내용에 좀더 내용을 추가해본다. 함수의 이름은 유지하는데 내용은 바꾸고 싶다면 내용을 바꿔씀. 이것이 오버라이딩이다.  
+```python
+class DrawSinusoidal2(DrawSinusoidal):
+    def draw_sin(self):
+        y = self.calc_sin()
+        plt.figure(figsize=(12,6))
+        plt.plot(self.t, y)
+        plt.title('Sin Graph ')
+        plt.ylabel('Sin')
+        plt.xlabel('time (sec)')
+        plt.grid()
+        plt.show()
+```
+동작을 확인해본다면 다음과 같다.
+```python
+dc2 = DrawSinusoidal2(1, 1, 0, 3)
+dc2.draw_sin()
+```
+<img width="1021" height="545" alt="download" src="https://github.com/user-attachments/assets/1a5c1b35-3097-4909-b517-13f462deef2d" />        
+
+## P-9 클래스에서 super의 사용
+다시 DrawSinusoidal2를 상속 받는 클래스를 만들어주고 init에 새로운걸 추가해주고 싶어 다음과 같이 클래스를 만들어주었다. 
+```python
+class DrawSinusoidal3(DrawSinusoidal2):
+    def __init__(self, amp, freq, bias, end_time, ts):
+        self.ts = ts
+```
+이후 확인해보면 다음과 같이 1개만 뜨게 된다.    
+```python
+ds3 = DrawSinusoidal3(1, 1, 0, 3, 0.01)
+ds3.__dict__
+```
+```
+{'ts': 0.01}
+```
+나도 모르게 __init__을 오버라이딩 시켰다. 그래서 ts만 살아남게 된거다. but,의도는 원래 있는것에 self.ts = ts 이 문장 하나를 끼워 넣고 싶었을 뿐이다. 따라서 이럴 때 사용하는 명령어가 바로 'super'이다. 
+```python
+class DrawSinusoidal3(DrawSinusoidal2):
+    def __init__(self, amp, freq, bias, end_time, ts):
+        super().__init__(amp, freq, bias, end_time)
+        self.ts = ts
+```
+```python
+ds3 = DrawSinusoidal3(1, 1, 0, 3, 0.01)
+ds3.__dict__
+```
+```
+{'amp': 1, 'freq': 1, 'bias': 0, 'end_time': 3, 'ts': 0.01}
+```
+따라서 클래서 super을 이용해서 클래스를 완성 할 수 있다. 
+```
+class DrawSinusoidal3(DrawSinusoidal2):
+    def __init__(self, amp, freq, bias, end_time, ts):
+        super().__init__(amp, freq, bias, end_time)
+        self.ts = ts
+
+    def calc_sin(self):
+        self.t = np.arange(0, self.end_time, self.ts)
+        return self.amp * np.sin(2*np.pi*self.freq*self.t) + self.bias
+
+    def draw_sin(self):
+        y = self.calc_sin()
+        plt.figure(figsize=(12,6))
+        plt.plot(self.t, y)
+        plt.title('Sin Graph ')
+        plt.ylabel('Sin')
+        plt.xlabel('time (sec)')
+        plt.grid()
+        plt.show()
+```
