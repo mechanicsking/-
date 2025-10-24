@@ -114,8 +114,9 @@ draw_sin(t, 1, 1, 0)
 ```
 <img width="1002" height="505" alt="download" src="https://github.com/user-attachments/assets/31af575b-d29e-4bb2-a280-0d6158602a70" />
 ## P-4&5 클래스 만들어보기
+
 이번에는 클래스를 이용해서 sin그래프를 만들어보자!    
-간단한 클래스 선언
+간단한 클래스 선언    
 ```python
 class DrawSin:
     def __init__(self, amp, freq, bias, end_time) :
