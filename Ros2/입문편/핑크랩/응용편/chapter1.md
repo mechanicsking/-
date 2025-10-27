@@ -90,3 +90,47 @@ Node를 상속받아 TurtlesimSubscriber라는 이름의 class를 만들어준�
 rqt_graph를 확인해본다면 다음과 같다.    
 <img width="831" height="449" alt="image" src="https://github.com/user-attachments/assets/387c16df-9c63-40eb-b952-863d76f8551c" />     
 
+## 1.7 내가 만든 package에 topic 발행 기능 넣어보기
+이번에는 publisher도 만들어보자. 소스코드가 my_subscriber과 비슷하지만 class의 내용이 좀 달라졌다.
+```python
+import rclpy as rp
+from rclpy.node import Node
+
+from geometry_msgs.msg import Twist
+
+class TurtlesimPublisher(Node):
+    
+    def __init__(self):
+        super().__init__('turtlesim_publisher')
+        self.publisher = self.create_publisher(Twist, '/turtle1/cmd_vel', 10)
+        timer_period = 0.5
+        self.timer = self.create_timer(timer_period, self.timer_callback)
+        
+    def timer_callback(self):
+        msg = Twist()
+        msg.linear.x = 2.0
+        msg.angular.z = 2.0
+        self.publisher.publish(msg)
+
+def main(args=None):
+    rp.init(args=args)
+    
+    turtlesim_publisher = TurtlesimPublisher()
+    rp.spin(turtlesim_publisher)
+    
+    turtlesim_publisher.destroy_node()
+    rp.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+TurtlesimPublisher 클래스에서는 create_publisher를 이용해서 Twist타입의 /turtle1/cmd_vel토픽에 퍼블리쉬할 수 있게 self.publisher에 저장해주고 create_timer를 이용해 주기마다 timer_callback함수를 실행할 수 잇게 해주었다. timer_callback함수는 Twist타입을 msg로 받고 msg.linear.x에 2.0과 msg.angular.z에 2.0을 저장해주어 self.pujblisher가 msg를 publish하게 해주었다.     
+이렇게 노드를 만들었기 때문에 setup.py에 추가한 노드를 추가해주어야한다.      
+```python
+'my_publisher = my_first_package.my_publisher:main'
+```
+colcon build를 한 후 해당 노드를 실행해보면 잘 작동하는 것을 확인 해 볼 수 있다.      
+<img width="1337" height="509" alt="image" src="https://github.com/user-attachments/assets/7e28b327-8b45-44d7-9773-ccdf42b095ce" />       
+
+우리가 만든 subscriber 노드도 실행해보자     
+<img width="2217" height="901" alt="image" src="https://github.com/user-attachments/assets/0f89bcb1-5046-4b5c-8765-d5bc0a1c60c5" />       
