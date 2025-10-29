@@ -123,7 +123,7 @@ if __name__ == '__mian__':
 ## 2.4 내가 정의한 메시지 사용해보기
 이제 이 노드에 2.1에서 새로 정의한 메시지 정의를 import하도록 코드를 수정해보자.  
 ```python
-from my_first_package_msgs import CmdAndPoseVel
+from my_first_package_msgs.msg import CmdAndPoseVel
 ```
 그리고 CmdAndPoseVel을 객체화한다. 
 ```python
@@ -138,3 +138,68 @@ self.cmd_pose = CmdAndPoseVel()
         self.cmd_pose.angular_vel = msg.angular_velocity
         print(self.cmd_pose)
 ```
+이제 colcon build를 해야하는데 이번에는 빌드를 하나의 패키지만 콕 찍어서 빌드해보자     
+```
+colcon build --packages-select my_first_package
+```
+turtlesim_node를 키고 turtle_cmd_and_pose를 키면 다음과 같이 작동한다.        
+<img width="1848" height="809" alt="image" src="https://github.com/user-attachments/assets/aa0cf774-48c8-455c-be72-cc9cd3ac4436" />          
+
+지금까지 우리는 토픽하나를 구독해서 내가 정의한 메시지에 이 값을 넣어 print해보았다.       
+## 2.5 하나의 노드에서 두 개 이상의 토픽 다루기 1
+우리는 cmd_vel 토픽을 구독하고 이를 저번에 만들어둔 pose토픽과 같이 출력할 것이다.       
+먼저 Twist타입을 import해준다.     
+```python
+from geometry_msgs.msg import Twist```
+이제 cmd_vel 토픽 구독을 위해 init 부분을 수정하자.    
+```python
+self.sub_cmdvel = self.create_subscription(Twist, '/turtle1/cmd_vel', self.callback_cmd, 10)
+```
+또하나의 토픽을 subscription한다. Twist타입의 /turtle1/cmd_vel 토픽을 구독할 것이다. 이후 callback함수를 수정해준다. 
+```python
+    def callback_pose(self, msg):
+        self.cmd_pose.pose_x = msg.x
+        self.cmd_pose.pose_y = msg.y
+        self.cmd_pose.linear_vel = msg.linear_velocity
+        self.cmd_pose.angular_vel = msg.angular_velocity
+    
+    def callback_cmd(self, msg):
+        self.cmd_pose.cmd_vel_linear = msg.linear.x
+        self.cmd_pose.cmd_vel_angular = msg.angular.z
+        
+        print(self.cmd_pose)
+```
+이후 코드는 다음과 같이 완성된다.      
+<img width="1178" height="982" alt="image" src="https://github.com/user-attachments/assets/f37f8b9e-5a33-444a-be2b-c772a3d35fa2" />         
+
+colcon build 이후 turtlesim_node와 저번에 만든 my_publisher노드와 현재 만든 turtle_cmd_and_pose노드를 실행한다.        
+<img width="1347" height="856" alt="image" src="https://github.com/user-attachments/assets/fdc49af7-2680-4427-b2e6-b03028c240af" />        
+
+잘 작동하는 모습을 확인 할 수 있다. rqt_graph를 확인해 보면 다음과 같다.     
+<img width="824" height="444" alt="image" src="https://github.com/user-attachments/assets/15dccdf0-6f07-41ee-8ede-15a8e82f7694" />       
+
+## 2.6 하나의 노드에서 두 개 이상의 토픽 다루기 2
+이제까지 토픽 두 개를 구독하는 것을 해보았다. 그 결과를 새로운 메시지 타입에 발행하는 것 해보자.        
+publish를 일정한 주기로 하기 위해서 timer로 만든다. 1초에 한번씩 timer_callback함수를 실행하는 timer와 CmdAndPoseVel타입인 /cmd_and_pose에 퍼블리쉬하는 __init__에 다음을 추가해준다. 
+```python
+self.timer_period = 1.0
+self.publisher = self.create_publisher(CmdAndPoseVel, '/cmd_and_pose', 10)
+self.timer = self.create_timer(self.timer_period, self.timer_callback)
+```
+이후 timer_callback함수를 만들어준다. call_back_cmd에서는 print를 없앤다.     
+```python
+def timer_callback(self):
+    self.publisher.publish(self.cmd_pose)
+```
+이후 저장해주고 colcon build후 실행해보면 다음과 같이 나타나는 것을 확인해 볼 수 있다. 
+<img width="1579" height="931" alt="image" src="https://github.com/user-attachments/assets/4164485e-62c1-4963-badb-b9ea7cd29166" />          
+
+이제 echo를 통해 메시지가 잘 발행되는 지 확인해보자. 
+```
+ros2 topic echo /cmd_and_pose
+```
+<img width="2042" height="969" alt="image" src="https://github.com/user-attachments/assets/09f52789-87cd-44b8-9b68-6ad6975981c8" />        
+
+잘 발행되고 있는 모습을 확인해 볼 수 있다.    
+## 2.7 서비스 메시지 정의 만들기
+
