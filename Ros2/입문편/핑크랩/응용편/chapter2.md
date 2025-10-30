@@ -211,7 +211,201 @@ float64[] x
 float64[] y
 float64[] theta
 ```
-우리는 turtlesim 노드의 서비스를 사용할 때 이 서비스의 definition을 알았어야 한다. 그때의 definition이 위의 내용과 같이      
+여기서 대괄호는 배열이다. 우리는 turtlesim 노드의 서비스를 사용할 때 이 서비스의 definition을 알았어야 한다. 그때의 definition이 위의 내용과 같이      
+```
 request     
 ---    
-respose    
+response    
+```
+였다. 서비스 정의는 **request와 response를 구분**해야한다는 것을 기억하자. 이제 CMakeLists.txt를 수정한다. 지난번에 만든 "msg/CmdAndPoseVel.msg"밑에 다음의 줄을 추가한다.     
+```txt
+"srv/MultiSpawn.srv"   
+```
+package.xml도 수정해야하는데 저번에 msg 정의를 할때 만들어두었다. 이후 colcon build해준다.다시 환경을 부르고 interface show를 통해 확인해보자. 
+```
+ros2 interface show my_first_package_msgs/srv/MultiSpawn 
+```
+```
+int64 num
+---
+float64[] x
+float64[] y
+float64[] theta
+```
+잘 나오는 것을 확인할 수 있다.    
+## 2.8 서비스 서버 만들기
+서비스 정의를 만들었으니 이제 이것을 사용할 서버를 만든다.     
+my_first_package에서 my_service_sever.py를 만들자.     
+```python
+from my_first_package_msgs.srv import MultiSpawn
+import rclpy as rp
+from rclpy.node import Node
+
+class MultiSpawning(Node):
+    
+    def __init__(self):
+        super.__init__('multi_spawn')
+        self.server = self.create_service(MultiSpawn, 'multi_spawn', self.callback_service)
+        
+    def callback_service(self, request, response):
+        print('Request : ', request)
+        
+        response.x = [1., 2., 3.]
+        response.y = [10., 20.]
+        response.theta = [100., 200., 300.]
+        
+        return response
+def main(args=None):
+    rp.init(args=args)
+    multi_spawn = MultiSpawning()
+    rp.spin(multi_spawn)
+    rp.shutdown()
+    
+if __name__ == '__main__':
+    main()
+```
+MultiSpawn을 import해주고 class에서 create_service라는 명령을 사용햇다. 이게 서비스 서버를 만드는 명령이다. 여기서 어떤데이터타입을 사용할 것이고, 서비스 이름은 무엇이고,또한  서비스를 request한다면 실행해야하는 callback함수를 넣어준다. 우리가 만든 callback함수에서는 x,y,theta를 배열형태로 response해준다. 그 후 setup.py에 가서 한줄 추가해준다. 
+```python
+'my_service_server = my_first_package.my_service_server:main'
+```
+이제 빌드 후 서비스를 실행하고 service list를 확인해보면 다음과 같이 나오는 것을 확인해볼 수 있다.        
+<img width="1353" height="664" alt="image" src="https://github.com/user-attachments/assets/1914a931-0c50-44a3-a506-6aaf15e47b8d" />         
+
+이제 서비스를 킨 상태에서 다른 터미널에서 service call을 통해 num을 줘 보자.    
+```
+ros2 service call /multi_spawn my_first_package_msgs/srv/MultiSpawn "{num: 1}"
+```
+<img width="1361" height="431" alt="image" src="https://github.com/user-attachments/assets/a21365e7-99be-4776-a660-b4b3d103de54" />      
+response를 받는 것을 확인해 볼 수 있다.     
+이제 이 코드에 살을 붙여 나가보자!!
+## 2.9 서비스 서버 만들기 응용편
+우리가 만들고 있는 서비스 서버에 teleport_absolute에 대한 클라이언트를 만들어볼 것이다. 
+```python
+from my_first_package_msgs.srv import MultiSpawn
+from turtlesim.srv import TeleportAbsolute
+
+import rclpy as rp
+from rclpy.node import Node
+
+class MultiSpawning(Node):
+    
+    def __init__(self):
+        super().__init__('multi_spawn')
+        self.server = self.create_service(MultiSpawn, 'multi_spawn', self.callback_service)
+        self.teleport = self.create_client(TeleportAbsolute, '/turtle1/teleport_absolute')
+        self.req_teleport = TeleportAbsolute.Request()
+        
+    def callback_service(self, request, response):
+        self.req_teleport.x = 1.
+        self.teleport.call_async(self.req_teleport)
+        
+        return response
+    
+def main(args=None):
+    rp.init(args=args)
+    multi_spawn = MultiSpawning()
+    rp.spin(multi_spawn)
+    rp.shutdown()
+    
+if __name__ == '__main__':
+    main()
+```
+create_client를 만들어준다. 타입은 TeleportAbsolut이며 이름은 /turtle1/teleport_absolute이다. 그리고 req_teleport에 TeleportAbsolute.Request()를 잡아줬다. 그리고 callback_service에서 call_async를 해주면 이동하게 된다. 이제 빌드를 하고 turtlesim을 실행하고 my_service_server를 실행하고 다음과 같이 call해주면        
+<img width="1360" height="855" alt="image" src="https://github.com/user-attachments/assets/9c6a1243-c28a-4fda-90a8-7485a0ff96a4" />     
+
+서비스 서버 안에서 서비스 클라이언트를 만들수 있다는 것이 이번 코드에서 중요한 점이다. 
+## 2.10 원하는 위치에 turtle 배치하는 알고리즘 작성하기
+이제 거북이 원으로 배치하기 전에 알고리즘을 만들어야한다.     
+8개의 거북이를 다음과 같이 배치하고 싶다면, 좌표계산을 어떻게 계산해야할지 알고리즘을 짜야한다.    
+<img width="475" height="456" alt="image" src="https://github.com/user-attachments/assets/38f26095-5abf-4062-b106-63f70ddc86f7" />      
+
+이때 jupyter note북을 이용해서 좌표를 구해보자. 
+<img width="886" height="429" alt="image" src="https://github.com/user-attachments/assets/80b90f6e-bbc3-41e2-9ee8-2a579d1ddaf3" />       
+
+<img width="853" height="279" alt="image" src="https://github.com/user-attachments/assets/4a10566b-bcad-4481-85a1-b6c59fb5008d" />       
+
+<img width="853" height="279" alt="image" src="https://github.com/user-attachments/assets/6458974f-fbd4-4fa8-abad-da8052409584" />     
+
+<img width="864" height="376" alt="image" src="https://github.com/user-attachments/assets/cdc28daa-53ea-40ed-b096-25db0031d62f" />    
+
+<img width="894" height="491" alt="image" src="https://github.com/user-attachments/assets/37c3123d-46df-4be0-93b2-628c5073e684" />    
+
+이렇게 좌표를 구할 수 있다. 
+
+<img width="814" height="337" alt="image" src="https://github.com/user-attachments/assets/b29f5445-574b-42e2-ae2a-06dcdc706239" />
+
+<img width="814" height="337" alt="image" src="https://github.com/user-attachments/assets/f06dcf5f-1580-4950-8c49-e66bc35c6c42" />
+
+<img width="796" height="478" alt="image" src="https://github.com/user-attachments/assets/85f26bc3-7b73-4250-bf99-62b8ca941dd3" />    
+
+## 2.12 다수의 서비스 클라이언트 구현하기
+위에서 만든 알고리즘을 이용해 서비스를 만들어보자. 
+import부분
+```python
+from my_first_package_msgs.srv import MultiSpawn
+from turtlesim.srv import TeleportAbsolute
+from turtlesim.srv import Spawn
+
+import time
+import rclpy as rp
+import numpy as np
+from rclpy.node import Node
+```
+MultiSpawning 클래스의 init
+```python
+def __init__(self):
+    super().__init__('multi_spawn')
+    self.server = self.create_service(MultiSpawn, 'multi_spawn', self.callback_service)
+    self.teleport = self.create_client(TeleportAbsolute, '/turtle1/teleport_absolute')
+    self.spawn = self.create_client(Spawn, '/spawn')
+    self.req_teleport = TeleportAbsolute.Request()
+    self.req_spawn = Spawn.Request()
+    self.center_x = 5.54
+    self.center_y = 5.54
+```
+Spawn타입의 /spawn서비스를 사용하는 client를 만들어주었다. 그리고 center값을 잡아준다. 이후 위에 chapther에서 만든 알고리즘을 함수로 넣어준다.    
+```python
+def calc_position(self, n, r):
+    gap_theta = 2*np.pi / n
+    theta = [gap_theta * n for n in range(n)]
+    x = [r*np.cos(th) for th in theta]
+    y = [r*np.sin(th) for th in theta]
+        
+    return x, y, theta
+```
+이제 callback함수를 만든다. 
+```python
+    def callback_service(self, request, response):
+        x, y, theta = self.calc_position(request.num, 3)
+        
+        for n in range(len(theta)):
+            self.req_spawn.x = x[n] + self.center_x
+            self.req_spawn.y = y[n] + self.center_y
+            self.req_spawn.theta = theta[n]
+            self.spawn.call_async(self.req_spawn)
+            time.sleep(0.1)
+            
+        response.x = x
+        response.y = y
+        response.theta = theta
+        
+        return response
+```
+서비스 서버에 client가 달라붙었을때 request할 때 실행되는 함수이다. 마지막으로 main함수를 만든다.       
+```python
+def main(args=None):
+    rp.init(args=args)
+    multi_spawn = MultiSpawning()
+    rp.spin(multi_spawn)
+    rp.shutdown()
+    
+if __name__ == '__main__':
+    main()
+```
+이후 빌드하고 turtlesim을 실행하고 서비스 실행하고 서비스를 호출해보자. 
+```
+ros2 service call /multi_spawn my_first_package_msgs/srv/MultiSpawn "{num: 5}"
+```
+num: 5로 했기에 5마리가 소환되는 것을 확인해 볼 수 있다.    
+<img width="1374" height="864" alt="image" src="https://github.com/user-attachments/assets/2ef32668-8972-48c4-a73d-d7e034bb2277" />    
+
