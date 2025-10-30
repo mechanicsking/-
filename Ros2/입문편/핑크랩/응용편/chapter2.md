@@ -202,4 +202,16 @@ ros2 topic echo /cmd_and_pose
 
 잘 발행되고 있는 모습을 확인해 볼 수 있다.    
 ## 2.7 서비스 메시지 정의 만들기
-
+이번에는 서비스 정의를 만들어보자.     
+이전에 만들어둔 my_first_package_msgs폴더에 srv 폴더를 만든다. 이후 srv폴더에 MuldiSpawn.srv파일을 만들어준다. 그리고 다음과 같이 만들어준다.   
+```
+int64 num
+---
+float64[] x
+float64[] y
+float64[] theta
+```
+우리는 turtlesim 노드의 서비스를 사용할 때 이 서비스의 definition을 알았어야 한다. 그때의 definition이 위의 내용과 같이      
+request     
+---    
+respose    
