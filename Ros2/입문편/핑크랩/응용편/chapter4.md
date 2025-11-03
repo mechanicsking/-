@@ -91,3 +91,32 @@ from rcl_interfaces.msg import SetParametersResult
 여기서 add_on_set_parameters_callback은 누가 파라미터를 바꾸면 바로 반응하라는 명령어이다. 따라서 parametr_callback이라는 함수를 만들었고 이를 통해 반응해주었다. parametr_callback에서는 바뀐 파라미터 정보를 가지고 와서 param.name과 param.value를 출력해준다. 이제 파라미터를 변경하면 터미널에 바로 나올 것이다. 빌드 후 액션 서버를 실행해보자.       
 <img width="1359" height="765" alt="image" src="https://github.com/user-attachments/assets/66d90567-0d74-4126-82fd-0161b926cee2" />       
 
+이번에는 실제 코드 내부 변수에 적용해보자.      
+```python
+        self.declare_parameter('quantile_time', 0.75)
+        self.declare_parameter('almost_goal_time', 0.95)
+        
+        (quantile_time, almosts_time) = self.get_parameters(
+            ['quantile_time', 'almost_goal_time'])
+        self.quantile_time = quantile_time.value
+        self.almosts_time = almosts_time.value
+        
+        self.add_on_set_parameters_callback(self.parameter_callback)
+        
+    def parameter_callback(self, params):
+        for param in params:
+            print(param.name, "is changed to ", param.value)
+            
+            if param.name == 'quantile_time':
+                self.quantile.time = param.value
+            if param.name == 'almost_goal_time':
+                self.almosts_time = param.value
+                
+        print('quantile_time and almost_goal_time is ',
+              self.quantile_time, self.almost_time)
+            
+        return SetParametersResult(successful=True)
+```
+가지고 온 변수의 내용들을 self로 잡아주었다. 이후 callback함수에서는 바뀐게 있으면 self의 값도 변경할수있게 만들어주었다. 그리고 변경된 내용도 프린트 한다.       
+<img width="1359" height="765" alt="image" src="https://github.com/user-attachments/assets/3944bb98-13f0-4a07-b35e-70dd7835a8b6" />         
+
