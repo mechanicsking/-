@@ -38,10 +38,12 @@
   <material>
 </visual>
 ```
+```
 geometry: 실제모양(하위테그--> <box size="..."/>: 직육면체, <cylinder radius="..." length="..."/>: 원기둥, <sphere radius="..."/>: 구, <mesh filename="..."/>: (가장 많이 사용됨) 3D 모델링 파일(.stl, .dae)을 불러옵니다.)      
 origin: 위에서 정의한 <geometry>(모양)를 이 링크(부품)의 기준점(0,0,0)에서 얼마나 떨어뜨리고 회전시킬지 정의한다.(하위속성--> xyz="...": x, y, z 축으로 이동할 거리 (m), rpy="...": Roll, Pitch, Yaw (오일러 각)로 회전할 각도 (rad).)       
 material: 이 부품의 색상이나 질감 정의(하위테그--> <color rgba="..."/>: R G B Alpha (빨강, 초록, 파랑, 투명도) 값을 0~1 사이로 지정합니다. (예: rgba="1 0 0 1" = 불투명한 빨간색), <texture filename="..."/>: 색상 대신 이미지 텍스처 파일을 입힐 때 사용합니다.)      
-다음은 collision이다.   
+다음은 collision이다.
+```
 ```
 <collision>
   <geometry>
