@@ -45,3 +45,5 @@ Spawner Script는 robot_state_publisher가 발행한 /robot_description (설계�
 4. robot_state_publisher가 /joint_states를 구독하고, URDF와 조합하여 최종 자세를 **TF System**으로 발행합니다.
 5. RViz 같은 다른 노드들은 TF System을 보고 로봇의 현재 자세를 그립니다.
 
+### Example
+우리는 urdf chapter에서 만든 것에서 urdf를 업그레이드하여 시뮬레이션된 가상환경에 넣을 것이다.   우리는 ros2 통합으로 가제보를 실행할 것이기 때문에 다음과 같은 명령어로 가제보를 열어줄거다.     
