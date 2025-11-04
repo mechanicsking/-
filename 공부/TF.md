@@ -28,3 +28,42 @@ Broadcaster (발행자): robot_state_publisher처럼 TF 정보를 방송하는 �
 Listener (수신자): Nav2처럼 TF 정보를 받아서 계산을 요청하는 노드입니다.      
 ### The ROS Transform System (TF)
 #### Broadcasting static TFs
+```
+ros2 run tf2_ros static_transform_publisher x y z yaw pitch roll parent_frame child_frame
+```
+의 기본 구조를 갖는다.     
+<img width="984" height="578" alt="image" src="https://github.com/user-attachments/assets/a97bf415-5817-485d-a391-53456706abde" />      
+
+이 이미지를 구현해보자.   
+```
+ros2 run tf2_ros static_transform_publisher 2 1 0 0.705 0 0 world robot_1
+```
+world의 좌표에서 robot_1좌표까지의 특성을 적어서 tf2를 작동시켜준다. 이후 robo_1좌표에서 robot_2좌표도 구현해준다.   
+```
+ros2 run tf2_ros static_transform_publisher 1 0 0 0 0 0 robot_1 robot_2
+```
+이후 rviz2를 켜준다. 
+```
+ros2 run rviz2 rviz2 
+```
+이후 add에서 tf를 add해주고 fixed Frame을 world로 바꿔주면 다음과 같이 뜬다.    
+<img width="1793" height="1022" alt="image" src="https://github.com/user-attachments/assets/20f9650b-f476-4b10-805a-a6ea7ab7c13c" />          
+
+<img width="1793" height="1022" alt="image" src="https://github.com/user-attachments/assets/2653f3ea-8ea8-493c-b367-96c8c1e8fd66" />       
+
+yaw값을 90도 1.57rad으로 바꾸어 보면 다음과 같이 바뀌는 것을 확인할 수 있다.     
+<img width="1793" height="1022" alt="image" src="https://github.com/user-attachments/assets/d08160e5-22b2-4315-8ed9-51391bb89418" />       
+
+#### Broadcasting dynamic TFs
+<img width="1350" height="748" alt="image" src="https://github.com/user-attachments/assets/966b96db-a60b-4335-83d3-8288f9dce1a6" />       
+
+<img width="1350" height="748" alt="image" src="https://github.com/user-attachments/assets/fc2e6ad8-7954-462e-b24e-ba3216f5c142" />        
+
+### TF를 만드는 2가지 재료
+1. URDF     
+런치 파일이 .xacro 파일을 URDF 텍스트로 변환해서, robot_state_publisher 노드를 실행할 때 **파라미터(robot_description)**로 전달해 줍니다.      
+이것은 로봇의 "뼈대"가 어떻게 생겼는지 알려주는 정적인(static) 정보입니다. (예: "팔꿈치는 어깨에서 30cm 아래에 있다.")      
+
+2. 현재 관절 각도(/joint_states 토픽)      
+robot_state_publisher는 /joint_states라는 토픽을 **구독(subscribe)**합니다.
+다른 노드(예: Gazebo 플러그인, 실제 로봇 드라이버, RViz의 슬라이더)가 이 토픽으로 "현재 팔꿈치가 30도 굽혀졌다!" 같은 동적인(dynamic) 정보를 계속 보냅니다.     
