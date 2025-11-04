@@ -46,4 +46,82 @@ Spawner Script는 robot_state_publisher가 발행한 /robot_description (설계�
 5. RViz 같은 다른 노드들은 TF System을 보고 로봇의 현재 자세를 그립니다.
 
 ### Example
-우리는 urdf chapter에서 만든 것에서 urdf를 업그레이드하여 시뮬레이션된 가상환경에 넣을 것이다.   우리는 ros2 통합으로 가제보를 실행할 것이기 때문에 다음과 같은 명령어로 가제보를 열어줄거다.     
+우리는 urdf chapter에서 만든 것에서 urdf를 업그레이드하여 시뮬레이션된 가상환경에 넣을 것이다.   우리는 ros2 통합으로 가제보를 실행할 것이기 때문에 다음과 같은 명령어로 가제보를 열어줄거다.    
+```
+ros2 launch gazebo_ros gazebo.launch.py 
+```
+이렇게 하면 gazebo가 실행되고 비어있는 공간으로 시작한다. 그리고 우리가 하려는 것은 로봇을 생성하는 것이다. urdf 파일을 sdf파일로 변환하여 가제보 world에 생성하는 코드도 제공되어있다.  
+```
+ros2 run gazebo_ros spawn_entity.py -topic robot_description -entity my_bot
+```
+이렇게 하면/robot_description라는 토픽을 구독하여 그 토픽에 있는 로봇 설계도를 받아서 sdf로 바꿔 가제보 월드로 로봇을 생성해준다. 그 토픽은 미리 만든 lauch를 이용해준다.    
+```
+ros2 launch urdf_example rsp.launch.py 
+```
+이러면 가제보에 my_bot이라는 이름으로 로봇이 생성된다.    
+<img width="1568" height="930" alt="image" src="https://github.com/user-attachments/assets/094c949d-387d-4029-b38e-7a05f9c7860c" />        
+
+이를 한번에 할 수 있게 런치 파일을 만들었다.    
+```python
+import os
+from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+
+
+from launch_ros.actions import Node
+import xacro
+
+
+def generate_launch_description():
+
+    # Specify the name of the package and path to xacro file within the package
+    pkg_name = 'urdf_example'
+    file_subpath = 'description/example_robot.urdf.xacro'
+
+
+    # Use xacro to process the file
+    xacro_file = os.path.join(get_package_share_directory(pkg_name),file_subpath)
+    robot_description_raw = xacro.process_file(xacro_file).toxml()
+
+
+    # Configure the node
+    node_robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        output='screen',
+        parameters=[{'robot_description': robot_description_raw,
+        'use_sim_time': True}] # add other parameters here if required
+    )
+
+
+
+    gazebo = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('gazebo_ros'), 'launch'), '/gazebo.launch.py']),
+        )
+
+
+    spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',
+                    arguments=['-topic', 'robot_description',
+                                '-entity', 'my_bot'],
+                    output='screen')
+
+
+
+
+
+
+    # Run the node
+    return LaunchDescription([
+        gazebo,
+        node_robot_state_publisher,
+        spawn_entity
+    ])
+```
+런치파일을 실행하면 다음과 같이 작동한다. 
+```
+ros2 launch urdf_example rsp_sim.launch.py 
+```
+<img width="1568" height="930" alt="image" src="https://github.com/user-attachments/assets/1de774bd-f5a9-4f64-ad19-0c2511ef4e41" />        
