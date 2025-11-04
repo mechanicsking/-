@@ -59,9 +59,10 @@ ros2 run gazebo_ros spawn_entity.py -topic robot_description -entity my_bot
 ros2 launch urdf_example rsp.launch.py 
 ```
 이러면 가제보에 my_bot이라는 이름으로 로봇이 생성된다.    
-<img width="1568" height="930" alt="image" src="https://github.com/user-attachments/assets/094c949d-387d-4029-b38e-7a05f9c7860c" />        
+<img width="1716" height="1158" alt="image" src="https://github.com/user-attachments/assets/15578350-dca3-456b-a279-f6e69e239152" />      
 
-이를 한번에 할 수 있게 런치 파일을 만들었다.    
+색이 이상한 걸 확인할 수 있다.    
+이를 한번에 할 수 있게 런치 파일을 만들었다.       
 ```python
 import os
 from ament_index_python.packages import get_package_share_directory
@@ -124,4 +125,148 @@ def generate_launch_description():
 ```
 ros2 launch urdf_example rsp_sim.launch.py 
 ```
-<img width="1568" height="930" alt="image" src="https://github.com/user-attachments/assets/1de774bd-f5a9-4f64-ad19-0c2511ef4e41" />        
+
+우리는 로봇에 기능을 추가해 줄것이다. 따라서 example_robot.urdf.xacro파일에 </robot> 전에 <xacro:include filename="example_gazebo.xacro" />를 추가해준다. 따라서 이를 통해 여기에 있는 기능들을 include해줄 것이다.    
+example_gazebo.xacro파일을 <gazebo>태그를 이용하여 다음과 같이 만들어줄것이다. <gazebo> 태그는 Gazebo 시뮬레이터 전용 설정을 URDF/Xacro 파일 안에 추가하기 위한 태그이다. ROS의 다른 도구들(예: RViz나 robot_state_publisher)은 이 <gazebo> 태그를 완전히 무시한다. 오직 Gazebo 시뮬레이터만 이 태그를 읽어서 사용한다.     
+#### <gazebo> 태그의 핵심 사용처
+##### 1. 플러그인(Plugin) 로드 (가장 중요)
+이것이 <gazebo> 태그의 가장 중요한 용도이다. Gazebo 안에서 ROS 2 토픽과 통신하거나 로봇을 움직이게 하는 "소프트웨어"를 로드한다.     
+예시: 
+```xacro
+<gazebo reference="base_link">
+  <plugin name="gazebo_ros_diff_drive" filename="libgazebo_ros_diff_drive.so">
+    <left_joint>left_wheel_joint</left_joint>
+    <right_joint>right_wheel_joint</right_joint>
+    <command_topic>cmd_vel</command_topic>
+    </plugin>
+</gazebo>
+```
+##### 2. 센서(Sensor) 시뮬레이션 정의
+Lidar, 카메라, IMU 같은 센서가 Gazebo 안에서 어떻게 작동할지(데이터 발행 주기, 노이즈 등) 정의한다. 
+```xacro
+<gazebo reference="lidar_link">
+  <sensor type="ray" name="my_lidar_sensor">
+    <update_rate>10</update_rate> <plugin name="gazebo_ros_ray_sensor" filename="libgazebo_ros_ray_sensor.so">
+      </plugin>
+  </sensor>
+</gazebo>
+```
+##### 3. 물리 속성(Physics) 및 색상 정의
+URDF의 <collision>이나 <visual>에서 설정할 수 없는, Gazebo 전용 물리 값(마찰력, 반발력)이나 색상을 정의한다. 
+```xacro
+<gazebo reference="wheel_link">
+  <mu1>1.0</mu1> <mu2>1.0</mu2> <material>Gazebo/Red</material>
+</gazebo>
+```
+example_gazebo.xacro로 다시 돌아온다. 
+```xacro
+    <gazebo reference="base_link">
+        <material>Gazebo/Green</material>
+    </gazebo>
+
+    <gazebo reference="slider_link">
+        <material>Gazebo/Blue</material>
+    </gazebo>
+
+    <gazebo reference="arm_link">
+        <material>Gazebo/Orange</material>
+    </gazebo>
+```
+원래대로 한다면 흰색이 뜨게 되는데 가제보에서 제공하는 색상을 사용하여 색이 잘 나올 수 잇게 해준다.       
+<img width="1866" height="1056" alt="image" src="https://github.com/user-attachments/assets/1fa2f6b4-acfd-4905-ac2b-4d78dcfe62bf" />       
+색이 잘 나오는 것을 확인해 볼 수 있다.    
+아직 조인트의 상태를 publish하지 않았기에 움직일 순 없다. 그다음 이 비트를 추가한다.     
+```xacro
+    <gazebo>
+        <plugin name="gazebo_ros_joint_state_publisher"
+            filename="libgazebo_ros_joint_state_publisher.so">
+            <update_rate>20</update_rate>
+            <joint_name>slider_joint</joint_name>
+            <joint_name>arm_joint</joint_name>
+        </plugin>
+    </gazebo>
+```
+이 파트는 joint의 state를 publish하는 파트이다. 이 플러그인이 실행되면, /joint_states (기본 토픽 이름)라는 토픽에 slider_joint와 arm_joint의 현재 각도(position) 정보를 1초에 20번씩 발행(publish)한다. 그러면 robot_state_publisher 노드가 이 /joint_states 토픽을 구독(subscribe)하여 최종 TF를 계산할 수 있게 된다. 이 플러그인은 gazebo_ros 패키지가 기본으로 제공하는 플러그인이다.    
+우리가 지금까지 한것은 joint controller plugin을 사용할 수 있게 해주었다.       
+<img width="1276" height="722" alt="image" src="https://github.com/user-attachments/assets/ec5dfa6e-7b25-4995-8c38-016f43747b98" />     
+
+다음으로 할건 joint_pose_trajectory 플러그인을 가져올것이다. 
+```xacro
+    <gazebo>
+        <plugin name="gazebo_ros_joint_pose_trajectory"
+            filename="libgazebo_ros_joint_pose_trajectory.so">
+            <update_rate>2</update_rate>
+        </plugin>
+    </gazebo>
+```
+여기서 가진 유일한 매개변수는 업데이트 속도이다. 조인트들이 너무 쉽게 움직이기 때문에 우리는 arm_joint와 slider_joint 조인트에 <dynamics damping="10.0" friction="10.0"/>를 추가하여 현실과 같이 만들어준다.     
+이제 토픽을 publish하여 각도를 조절해보자.   
+```
+ros2 topic pub -1 /set_joint_trajectory trajectory_msgs/msg/JointTrajectory  '{header: {frame_id: world}, joint_names: [slider_joint, arm_joint], points: [  {positions: {0.8,0.6}} ]}'
+```
+<img width="1786" height="844" alt="image" src="https://github.com/user-attachments/assets/3b632d40-2a08-4a35-8f62-880c33b90e38" />       
+
+잘작동한다. 이제 ros를 이용해 가제보 시뮬레이터를 움직일 수 있고 물리 법칙이 적용하여 다시 ros에 publish한다. 다음으로 할 것은 센서를 시뮬레이션하는 것이다. 가장 흥미로운 부분중 하나이다. 일단 카메라를 설치해서 world를 볼것이기에 world를 먼저 꾸며보자. insert탭을 통해 모델들을 추가한다.  
+우리가 ros에서 카메라를 사용할 때에는 광학조인트라는 추가 링크를 넣어야한다.      
+```xacro
+    <joint name="camera_optical_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="-1.571 0 -1.571" />
+        <parent link="camera_link" />
+        <child link="camera_link_optical" />
+    </joint>
+
+    <link name="camera_link_optical"></link>
+```
+그리고 마지막으로 카메라를 시뮬레이션하는데 필요한 태그를 가지고 온다.       
+```xacro
+    <gazebo reference="camera_link">
+        <sensor type="camera" name="my_camera">
+            <update_rate>20</update_rate>
+            <visualize>true</visualize>
+            <camera name="cam">
+                <horizontal_fov>1.3962634</horizontal_fov>
+                <image>
+                    <width>640</width>
+                    <height>480</height>
+                    <format>R8B8G8</format>
+                </image>
+                <clip>
+                    <near>0.02</near>
+                    <far>300</far>
+                </clip>
+                <noise>
+                    <type>gaussian</type>
+                    <mean>0.0</mean>
+                    <stddev>0.007</stddev>
+                </noise>
+            </camera>
+            <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+                <frame_name>camera_link_optical</frame_name>
+                <min_depth>0.1</min_depth>
+                <max_depth>500</max_depth>
+            </plugin>
+        </sensor>
+    </gazebo>
+```
+이제 gazebo에서 볼 수 있는 것은 카메라가 보고 있는 것의 미리보기를 확인할 수 있다.     
+ <img width="1786" height="844" alt="image" src="https://github.com/user-attachments/assets/f1857b25-b516-4ea8-a9d7-60b0be79970e" />        
+
+ rviz2에서도 image를 구독하면 카메라로 찍히는 것을 rviz로 가져올 수 있다.       
+<img width="1675" height="1023" alt="image" src="https://github.com/user-attachments/assets/a2c0dd57-29d2-44af-aecc-354d10de853e" />        
+
+gazebo에서 시뮬레이션되고 이미지가 ros로 전달되고 rviz에 표시할 수 있으며, 해당 topic에 publish되고 있다. 이번에는 depth카메라를 가져와보자. sensor type을 depth로 변경한다.     
+depth카메라를 사용할 때는 작은 미리보기가 나오지 않는다.      
+
+<img width="1675" height="1023" alt="image" src="https://github.com/user-attachments/assets/38695dca-ec63-4cf0-a521-6c85badb41b1" />      
+
+여기서 확인해 볼 수 있고 포인트 클라우드를 추가할 수도 있다. 포인트 클라우드를 확인하면 다음과 같이 확인해 볼 수 있다.     
+<img width="1675" height="1023" alt="image" src="https://github.com/user-attachments/assets/787a5e69-ef69-45de-b11c-47374be6f63f" />        
+
+가제보내에서 나무를 움직이면 rviz에서도 움직이는 것을 볼 수 있다.     
+<img width="3028" height="990" alt="image" src="https://github.com/user-attachments/assets/f11245b9-7c08-42d1-a97c-89ef9b050736" />     
+
+ros2 topic echo /clock을 통해 시간을 가져올 수 있다.     
+<img width="1368" height="861" alt="image" src="https://github.com/user-attachments/assets/893ea71c-42d6-448c-92b2-ab28606af632" />      
+이 시간을 보고 다른 노드들이 시간을 유지할 수 있다.     
+주의점!!    
+가제보는 실제로 하나의 프로그램이 아니랄 두개의 프로그램이다. 서버와 클라이언트가 있다. 한개에서 충돌이 발생할 수 있고, 둘다 충돌이 발생할 수 있다.     
