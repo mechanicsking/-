@@ -348,10 +348,6 @@ world링크와 base_link를 이어주는 조인트가 정의되어있다. 다음
         </xacro:inertial_box>
     </link>
 
-
-    <xacro:include filename="example_gazebo.xacro" />
-
-
 </robot>
 ```
 두개의 visual로 되어있으며 collision은 1개의 박스로 만들어주었다. 
