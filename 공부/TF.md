@@ -26,3 +26,5 @@ Frame (프레임): 각 부품의 고유한 "좌표계" 이름입니다. (예: ba
 Transform (변환): 한 Frame에서 다른 Frame으로 가는 "변환 정보"입니다. (위치(x,y,z) + 회전(Quaternion))       
 Broadcaster (발행자): robot_state_publisher처럼 TF 정보를 방송하는 노드입니다.       
 Listener (수신자): Nav2처럼 TF 정보를 받아서 계산을 요청하는 노드입니다.      
+### The ROS Transform System (TF)
+#### Broadcasting static TFs
