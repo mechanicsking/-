@@ -153,7 +153,7 @@ https://github.com/joshnewans/urdf_example  를 git clone을하여 따라가보�
 
 <img width="1278" height="713" alt="image" src="https://github.com/user-attachments/assets/26fe4a9e-38e9-4081-a347-89c55fb88170" />      
 
-이러한 모델을 살펴보자. example_robot.urdf.xacro 파일을 확인해보면 
+example_robot.urdf.xacro 파일을 확인해보면 
 ```xacro
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro"  name="robot">
