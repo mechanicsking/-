@@ -120,3 +120,9 @@ from rcl_interfaces.msg import SetParametersResult
 가지고 온 변수의 내용들을 self로 잡아주었다. 이후 callback함수에서는 바뀐게 있으면 self의 값도 변경할수있게 만들어주었다. 그리고 변경된 내용도 프린트 한다.       
 <img width="1359" height="765" alt="image" src="https://github.com/user-attachments/assets/3944bb98-13f0-4a07-b35e-70dd7835a8b6" />         
 
+## Parameter reconfigure
+먼저 dist_turtle_action_server을 실행한 후 rqt를 실행한다. rqt에서 plugins --> configurations --> dynamic reconfigure를 차례로 누른다.    
+<img width="1467" height="873" alt="image" src="https://github.com/user-attachments/assets/8fcb3937-eda3-41e4-aab5-84cfca4d2e12" />        
+
+gui 환경에서 편하기 파라미터를 변경할 수 있다.     
+
